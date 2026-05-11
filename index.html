@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFA Simulator – Midnight Blue</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ===== STICKY NAVIGATION BAR ===== -->
+    <nav class="sticky-nav" id="sticky-nav">
+        <div class="nav-inner">
+            <!-- <div class="nav-left">
+                <span class="nav-brand">DFA Simulator</span>
+            </div> -->
+            <div class="nav-center">
+                <button class="nav-btn active" id="nav-dfa" onclick="switchSection('dfa-regex')">DFA &amp; Regex</button>
+                <button class="nav-btn" id="nav-cfg" onclick="switchSection('cfg')">CFG</button>
+                <button class="nav-btn" id="nav-pda" onclick="switchSection('pda')">PDA</button>
+            </div>
+            <div class="nav-right">
+                <button class="nav-btn theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+                    <span class="theme-icon" id="theme-icon">☀</span>
+                </button>
+                <button class="nav-btn sub" id="nav-sub1" onclick="switchSubTabGlobal(1)">Regex 1</button>
+                <button class="nav-btn sub" id="nav-sub2" onclick="switchSubTabGlobal(2)">Regex 2</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-container">
+
+        <!-- ============ DFA & REGEX SECTION ============ -->
+        <section class="section-content active" id="section-dfa-regex">
+            <!-- Regex info cards -->
+            <div class="regex-info-card" id="regex-info-1">
+                <div class="card">
+                    <h2>Regular Expression 1</h2>
+                    <div class="regex-display">
+                        <code>(bab)*(b+a)(bab+aba)(a+b)*(aa+bb)*(b+a+bb)(a+b)*(aa+bb)</code>
+                    </div>
+                    <p class="sample-label">Sample valid strings</p>
+                    <ul class="sample-list">
+                        <li><code>bababaa</code></li>
+                        <li><code>bbabababb</code></li>
+                        <li><code>ababaaabb</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="regex-info-card" id="regex-info-2" style="display:none;">
+                <div class="card">
+                    <h2>Regular Expression 2</h2>
+                    <div class="regex-display">
+                        <code>(1+0)*(11+00)(00+11)*(1+0+11)(1+0+11)*(101+111)(101+111)*(1+0*+11)(1+0*+11)*</code>
+                    </div>
+                    <p class="sample-label">Sample valid strings</p>
+                    <ul class="sample-list">
+                        <li><code>110111010000111</code></li>
+                        <li><code>111000111010</code></li>
+                        <li><code>101000101011</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Two-column workspace for Regex 1 -->
+            <div class="two-column" id="two-column-1">
+                <div class="canvas-area">
+                    <div class="tape-panel" id="tape-panel-1">
+                        <div class="tape-title">Tape 1</div>
+                        <div class="tape-cells" id="tape-cells-1">
+                            <span class="tape-placeholder">Enter a string and run the simulation</span>
+                        </div>
+                    </div>
+                    <div class="svg-container">
+                        <svg id="dfa1-svg" viewBox="0 0 1600 600"></svg>
+                    </div>
+                </div>
+                <div class="control-panel">
+                    <div class="panel-section">
+                        <h3>Input String</h3>
+                        <input type="text" id="input1" placeholder="e.g., bababaa" autocomplete="off">
+                    </div>
+                    <div class="panel-section">
+                        <h3>Execution</h3>
+                        <div class="ctrl-btn-group">
+                            <button class="btn btn-run" id="run1-btn" onclick="startValidation(1)">Run</button>
+                            <button class="btn btn-step" id="step1-btn" onclick="manualStep(1)">Step</button>
+                        </div>
+                        <button class="btn btn-reset full-width" id="reset1-btn" onclick="resetSimulation(1)">Reset</button>
+                    </div>
+                    <div class="panel-section">
+                        <div class="status-badge" id="status1">&ndash;</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two-column workspace for Regex 2 -->
+            <div class="two-column" id="two-column-2" style="display:none;">
+                <div class="canvas-area">
+                    <div class="tape-panel" id="tape-panel-2">
+                        <div class="tape-title">Tape 2</div>
+                        <div class="tape-cells" id="tape-cells-2">
+                            <span class="tape-placeholder">Enter a string and run the simulation</span>
+                        </div>
+                    </div>
+                    <div class="svg-container">
+                        <svg id="dfa2-svg" viewBox="0 0 1300 520"></svg>
+                    </div>
+                </div>
+                <div class="control-panel">
+                    <div class="panel-section">
+                        <h3>Input String</h3>
+                        <input type="text" id="input2" placeholder="e.g., 110111010000111" autocomplete="off">
+                    </div>
+                    <div class="panel-section">
+                        <h3>Execution</h3>
+                        <div class="ctrl-btn-group">
+                            <button class="btn btn-run" id="run2-btn" onclick="startValidation(2)">Run</button>
+                            <button class="btn btn-step" id="step2-btn" onclick="manualStep(2)">Step</button>
+                        </div>
+                        <button class="btn btn-reset full-width" id="reset2-btn" onclick="resetSimulation(2)">Reset</button>
+                    </div>
+                    <div class="panel-section">
+                        <div class="status-badge" id="status2">&ndash;</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ CFG SECTION ============ -->
+        <section class="section-content" id="section-cfg">
+            <div class="cfg-single" id="cfg-regex-1">
+                <div class="card">
+                    <h2>Context‑Free Grammar – RE 1</h2>
+                    <pre class="cfg-display">
+S → A B C D E F G H
+A → bab A | ε
+B → a | b
+C → bab | aba
+D → a D | b D | ε
+E → aa E | bb E | ε
+F → a | b | bb
+G → a G | b G | ε
+H → aa | bb
+                    </pre>
+                </div>
+            </div>
+            <div class="cfg-single" id="cfg-regex-2" style="display:none;">
+                <div class="card">
+                    <h2>Context‑Free Grammar – RE 2</h2>
+                    <pre class="cfg-display">
+S → A B C D E F G H I
+A → 0 A | 1 A | ε
+B → 11 | 00
+C → 00 C | 11 C | ε
+D → 0 | 1 | 11
+E → 0 E | 1 E | 11 E | ε
+F → 101 | 111
+G → 101 G | 111 G | ε
+H → 1 | Z | 11
+I → H I | ε
+Z → 0 Z | ε
+                    </pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ PDA SECTION ============ -->
+        <section class="section-content" id="section-pda">
+            <div class="pda-single" id="pda-regex-1">
+                <div class="card">
+                    <h2>Pushdown Automaton – RE 1</h2>
+                    <div class="pda-container">
+                        <div class="pda-zoom-controls">
+                            <button class="btn btn-zoom-in" onclick="pdaZoom('pda-viewport-1', 1.25)" title="Zoom In">+</button>
+                            <button class="btn btn-zoom-out" onclick="pdaZoom('pda-viewport-1', 0.8)" title="Zoom Out">−</button>
+                            <button class="btn btn-zoom-reset" onclick="pdaResetView('pda-viewport-1')" title="Reset View">Reset View</button>
+                        </div>
+                        <div class="pda-viewport" id="pda-viewport-1">
+                            <img src="pda1.png" alt="PDA for RE 1" class="pda-zoomable-img" id="pda-img-1"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.img-fallback').style.display='flex';">
+                            <div class="img-fallback" style="display:none;">
+                                <p>Place <code>pda1.png</code> in the same folder.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pda-single" id="pda-regex-2" style="display:none;">
+                <div class="card">
+                    <h2>Pushdown Automaton – RE 2</h2>
+                    <div class="pda-container">
+                        <div class="pda-zoom-controls">
+                            <button class="btn btn-zoom-in" onclick="pdaZoom('pda-viewport-2', 1.25)" title="Zoom In">+</button>
+                            <button class="btn btn-zoom-out" onclick="pdaZoom('pda-viewport-2', 0.8)" title="Zoom Out">−</button>
+                            <button class="btn btn-zoom-reset" onclick="pdaResetView('pda-viewport-2')" title="Reset View">Reset View</button>
+                        </div>
+                        <div class="pda-viewport" id="pda-viewport-2">
+                            <img src="pda2.png" alt="PDA for RE 2" class="pda-zoomable-img" id="pda-img-2"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.img-fallback').style.display='flex';">
+                            <div class="img-fallback" style="display:none;">
+                                <p>Place <code>pda2.png</code> in the same folder.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>Reyes | Macalindong | Insigne | Santander</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
