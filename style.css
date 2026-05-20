@@ -419,6 +419,16 @@ body.light-theme .panel-section h3 {
     box-shadow: 0 2px 12px rgba(59,125,221,0.3);
 }
 
+.btn-back {
+    background: transparent;
+    color: var(--accent-blue-lit);
+    border: 2px solid var(--accent-blue-lit);
+}
+
+.btn-back:hover:not(:disabled) {
+    background: rgba(91,156,245,0.12);
+}
+
 .btn-reset {
     background: transparent;
     color: var(--orange-reset);

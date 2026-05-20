@@ -2,48 +2,78 @@
 // CORRECT DFA DATA (exactly as required)
 // =======================================================
 var dfa1 = {
-    states: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],   // trap state 15 added
+    states: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
     alphabet: ['a', 'b'],
     start: 0,
-    accept: [13,14],                                    // 15 is NOT accepting
+    accept: [11, 15],  // x1+ = 11, x2+ = 15
     transitions: [
-        // existing transitions (preserved)
+        // - (0): a→s1(1), b→q1(2)
         [0,"a",1], [0,"b",2],
-        [1,"a",3], [1,"b",4],
-        [2,"a",5], [2,"b",4],
-        [3,"b",6],
-        [4,"a",7],
-        [5,"b",8],
-        [6,"a",9],
-        [7,"b",9],
-        [8,"a",9], [8,"b",2],
-        [9,"a",10], [9,"b",10],
-        [10,"a",11], [10,"b",12],
-        [11,"a",13], [11,"b",12],
-        [12,"a",11], [12,"b",14],
-        [13,"a",13], [13,"b",12],
-        [14,"a",11], [14,"b",14],
 
-        // ---- added missing transitions (trap state 15) ----
-        [3,"a",15],
-        [4,"b",15],
-        [5,"a",15],
-        [6,"b",15],
-        [7,"a",15],
+        // s1 (1): a→s2(12), b→r1(5)
+        [1,"a",12], [1,"b",5],
 
-        // trap state self‑loops
-        [15,"a",15],
-        [15,"b",15]
+        // q1 (2): a→q2(3), b→r1(5)
+        [2,"a",3], [2,"b",5],
+
+        // q2 (3): b→q3(4), a→T(14)
+        [3,"b",4], [3,"a",14],
+
+        // q3 (4): b→q1(2), a→r3(7)
+        [4,"b",2], [4,"a",7],
+
+        // r1 (5): a→r2(6), b→T(14)
+        [5,"a",6], [5,"b",14],
+
+        // r2 (6): b→r3(7), a→T(14)
+        [6,"b",7], [6,"a",14],
+
+        // r3 (7): a→t1(8), b→t1(8)
+        [7,"a",8], [7,"b",8],
+
+        // t1 (8): a→t2(9), b→t3(10)
+        [8,"a",9], [8,"b",10],
+
+        // t2 (9): a→x1+(11), b→t3(10)
+        [9,"a",11], [9,"b",10],
+
+        // t3 (10): a→t2(9), b→x2+(15)
+        [10,"a",9], [10,"b",15],
+
+        // x1+ (11): a→x1+(11), b→t3(10)
+        [11,"a",11], [11,"b",10],
+
+        // s2 (12): a→T(14), b→s3(13)
+        [12,"a",14], [12,"b",13],
+
+        // s3 (13): a→r3(7), b→T(14)
+        [13,"a",7], [13,"b",14],
+
+        // T (14): a→T(14), b→T(14)
+        [14,"a",14], [14,"b",14],
+
+        // x2+ (15): a→t2(9), b→x2+(15)
+        [15,"a",9], [15,"b",15],
     ],
     positions: {
-        0:{x:40,y:240},   1:{x:140,y:150},  2:{x:140,y:330},
-        3:{x:240,y:80},   4:{x:240,y:240},  5:{x:240,y:390},
-        6:{x:340,y:80},   7:{x:340,y:240},  8:{x:340,y:390},
-        9:{x:460,y:240},  10:{x:580,y:240}, 11:{x:700,y:160},
-        12:{x:700,y:320}, 13:{x:840,y:160}, 14:{x:840,y:320},
-        15:{x:960,y:480}                           // far bottom‑right (trap)
+        0: {x:60,   y:100},   // - (start)  Row1 Col1
+        1: {x:60,   y:500},   // s1         Row4 Col1
+        2: {x:220,  y:100},   // q1         Row1 Col2
+        3: {x:540,  y:100},   // q2         Row1 Col4
+        4: {x:700,  y:100},   // q3         Row1 Col5
+        5: {x:220,  y:260},   // r1         Row2 Col2
+        6: {x:540,  y:260},   // r2         Row2 Col4
+        7: {x:700,  y:260},   // r3         Row2 Col5
+        8: {x:860,  y:260},   // t1         Row2 Col6
+        9: {x:1020, y:100},   // t2         Row1 Col7
+        10:{x:1020, y:500},    // t3         Row4 Col7
+        11:{x:1180, y:100},   // x1+        Row1 Col8
+        12:{x:220,  y:500},   // s2         Row4 Col2
+        13:{x:540,  y:500},      // s3         Row4 Col4
+        14:{x:380,  y:380},   // T (trap)   Row3 Col3
+        15:{x:1180, y:500},   // x2+        Row4 Col8
     },
-    transform: { dx: 118.88, dy: -63.78, scale: 1.548 }
+    transform: { dx: 20, dy: 20, scale: 1.4 }
 };
 
 var dfa2 = {
@@ -368,32 +398,34 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
         var width = isActive ? '3' : '1.8';
         var markerId = isActive ? mActive : mNorm;
 
-        // ---------- SELF-LOOPS (unchanged) ----------
+        // ---------- SELF-LOOPS ----------
         if (from === to) {
-            var p = pos[from];
-            var selfCount = 0;
-            for (var j = 0; j < dfa.transitions.length; j++) {
-                if (dfa.transitions[j][0] === from && dfa.transitions[j][2] === from) selfCount++;
-            }
-            var idx = 0;
+            // Check if this self-loop has already been drawn (for combined a,b label)
+            var alreadyDrawn = false;
             for (var k = 0; k < i; k++) {
-                if (dfa.transitions[k][0] === from && dfa.transitions[k][2] === from) idx++;
+                if (dfa.transitions[k][0] === from && dfa.transitions[k][2] === from) {
+                    alreadyDrawn = true; break;
+                }
             }
+            if (alreadyDrawn) continue; // skip second self-loop, already drawn combined
+
+            // Collect all self-loop symbols for this state
+            var selfSymbols = [];
+            for (var j = 0; j < dfa.transitions.length; j++) {
+                if (dfa.transitions[j][0] === from && dfa.transitions[j][2] === from) {
+                    selfSymbols.push(dfa.transitions[j][1]);
+                }
+            }
+            var selfLabel = selfSymbols.join(',');
+            var p = pos[from];
             var baseX = p.x, baseY = p.y - R;
-            var offX = 0, labelX = baseX, labelY = baseY - 50;
-            if (selfCount === 2) {
-                if (idx === 0) { offX = -25; labelX = p.x - 35; }
-                else           { offX = 25;  labelX = p.x + 35; }
-            } else {
-                labelX = p.x; labelY = p.y - 75;
-            }
-            var x1 = baseX + offX;
+            var x1 = baseX;
             var d = 'M ' + x1 + ' ' + baseY +
                     ' C ' + (x1 - 35) + ' ' + (baseY - 45) + ',' +
                     (x1 + 35) + ' ' + (baseY - 45) + ',' +
                     x1 + ' ' + baseY;
             addPath(d, color, width, markerId);
-            addLabel(labelX, labelY, symbol, color);
+            addLabel(baseX, baseY - 55, selfLabel, color);
             continue;
         }
 
@@ -422,8 +454,8 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
             var ey = y2 - (edy / elen) * (R + 1);
             var pathD = 'M ' + sx + ' ' + sy + ' Q ' + cpx + ' ' + cpy + ' ' + ex + ' ' + ey;
             addPath(pathD, color, width, markerId);
-            var labelX = cpx + px * (offset * 0.5);
-            var labelY = cpy + py * (offset * 0.5);
+            var labelX = 0.25*sx + 0.5*cpx + 0.25*ex;
+            var labelY = 0.25*sy + 0.5*cpy + 0.25*ey;
             addLabel(labelX, labelY, symbol, color);
             continue;
         }
@@ -493,11 +525,7 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
                 // Label along quadratic curve, offset toward the bulge
                 var bx = 0.25 * sx + 0.5 * cpx + 0.25 * ex;
                 var by = 0.25 * sy + 0.5 * cpy + 0.25 * ey;
-                addLabel(
-                    bx + px * (curveOffset * 0.35),
-                    by + py * (curveOffset * 0.35),
-                    symbol, color
-                );
+                addLabel(bx, by, symbol, color);
             }
             addPath(pathD, color, width, markerId);
             continue;
@@ -553,9 +581,32 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
                 var ey = y2 - (edy / elen) * (R + 1);
                 var pathD = 'M ' + sx + ' ' + sy + ' Q ' + cpx + ' ' + cpy + ' ' + ex + ' ' + ey;
                 addPath(pathD, color, width, markerId);
-                addLabel(cpx + px * (offset * 0.5), cpy + py * (offset * 0.5), symbol, color);
+                var labelX = 0.25*sx + 0.5*cpx + 0.25*ex;
+                var labelY = 0.25*sy + 0.5*cpy + 0.25*ey;
+                addLabel(labelX, labelY, symbol, color);
                 continue;
             }
+        }
+
+        // ---------- MANUAL CURVE OVERRIDES ----------
+        var manualCurves = {
+            '4-2': -80   // q3→q1 on b: curve 80px above Row1
+        };
+        var mcKey = from + '-' + to;
+        if (manualCurves[mcKey] !== undefined) {
+            var x1 = pos[from].x, y1 = pos[from].y;
+            var x2 = pos[to].x,   y2 = pos[to].y;
+            var cpx = (x1 + x2) / 2;
+            var cpy = Math.min(y1, y2) + manualCurves[mcKey];
+            var sdx = cpx-x1, sdy = cpy-y1, slen = Math.sqrt(sdx*sdx+sdy*sdy)||1;
+            var sx = x1+(sdx/slen)*R, sy = y1+(sdy/slen)*R;
+            var edx = x2-cpx, edy = y2-cpy, elen = Math.sqrt(edx*edx+edy*edy)||1;
+            var ex = x2-(edx/elen)*(R+1), ey = y2-(edy/elen)*(R+1);
+            addPath('M '+sx+' '+sy+' Q '+cpx+' '+cpy+' '+ex+' '+ey, color, width, markerId);
+            var mlx = 0.25*sx + 0.5*cpx + 0.25*ex;
+            var mly = 0.25*sy + 0.5*cpy + 0.25*ey;
+            addLabel(mlx, mly, symbol, color);
+            continue;
         }
 
         // ---------- SIMPLE SINGLE EDGE (straight line) ----------
@@ -569,10 +620,12 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
         var ex = x2 - nx * (R + 1), ey = y2 - ny * (R + 1);
         var pathD = 'M ' + sx + ' ' + sy + ' L ' + ex + ' ' + ey;
         addPath(pathD, color, width, markerId);
-        var labelX = (sx + ex) / 2 + px * 12;
-        var labelY = (sy + ey) / 2 + py * 12;
+        var labelX = (sx + ex) / 2;
+        var labelY = (sy + ey) / 2;
         addLabel(labelX, labelY, symbol, color);
     }
+
+    
 
     // --- DRAW STATE CIRCLES (unchanged) ---
     for (var j = 0; j < dfa.states.length; j++) {
@@ -609,7 +662,27 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
         lbl.setAttribute("text-anchor", "middle"); lbl.setAttribute("dominant-baseline", "central");
         lbl.setAttribute("font-size", "12"); lbl.setAttribute("font-weight", "700");
         lbl.setAttribute("fill", (fill === glowGreen || fill === glowRed) ? '#ffffff' : labelFill);
-        lbl.textContent = "q" + state; g.appendChild(lbl);
+        // Custom state labels
+        var stateLabels = {
+            0: '-',
+            1: 's1',
+            2: 'q1',
+            3: 'q2',
+            4: 'q3',
+            5: 'r1',
+            6: 'r2',
+            7: 'r3',
+            8: 't1',
+            9: 't2',
+            10: 't3',
+            11: '+',
+            12: 's2',
+            13: 's3',
+            14: 'T',
+            15: '+'
+        };
+        lbl.textContent = stateLabels[state] !== undefined ? stateLabels[state] : 'q' + state;
+        g.appendChild(lbl);     
         graphGroup.appendChild(g);
     }
 
@@ -733,7 +806,34 @@ function manualStep(dfaNum) {
     } else {
         document.getElementById('status' + dfaNum).textContent = 'Step ' + simulation.stepIndex;
         document.getElementById('status' + dfaNum).style.color = '#5b9cf5';
+        document.getElementById('back' + dfaNum + '-btn').disabled = false;
     }
+}
+
+function stepBack(dfaNum) {
+    if (simulation.dfaNum !== dfaNum) return;
+    if (simulation.autoTimer) return;
+    if (simulation.stepIndex <= 0) return;
+
+    simulation.finished = false;
+    simulation.stepIndex--;
+    var dfa = dfaNum === 1 ? dfa1 : dfa2;
+
+    drawDFA(dfa, 'dfa' + dfaNum + '-svg', simulation.path, simulation.stepIndex, null);
+    updateTape(dfaNum, simulation.input, simulation.stepIndex, null);
+
+    // Update status
+    var statusBadge = document.getElementById('status' + dfaNum);
+    if (simulation.stepIndex === 0) {
+        statusBadge.textContent = 'Tracing...';
+    } else {
+        statusBadge.textContent = 'Step ' + simulation.stepIndex;
+    }
+    statusBadge.style.color = '#5b9cf5';
+
+    // Re-enable Step, disable Back at start
+    document.getElementById('step' + dfaNum + '-btn').disabled = false;
+    document.getElementById('back' + dfaNum + '-btn').disabled = simulation.stepIndex <= 0;
 }
 
 function finishSimulation(dfaNum, dfa) {
@@ -770,6 +870,7 @@ function resetSimulation(dfaNum) {
     document.getElementById('input' + dfaNum).value = '';
     document.getElementById('run' + dfaNum + '-btn').disabled = false;
     document.getElementById('step' + dfaNum + '-btn').disabled = false;
+    document.getElementById('back' + dfaNum + '-btn').disabled = true;
     document.getElementById('status' + dfaNum).textContent = '\u2013';
     document.getElementById('status' + dfaNum).style.color = '#6a7f99';
 
@@ -792,6 +893,8 @@ function resetSimulationSilent(dfaNum) {
     if (elRun) elRun.disabled = false;
     var elStep = document.getElementById('step' + dfaNum + '-btn');
     if (elStep) elStep.disabled = false;
+    var elBack = document.getElementById('back' + dfaNum + '-btn');
+    if (elBack) elBack.disabled = true;
     var elStatus = document.getElementById('status' + dfaNum);
     if (elStatus) { elStatus.textContent = '\u2013'; elStatus.style.color = '#6a7f99'; }
 
