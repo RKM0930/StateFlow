@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DFA Simulator – Midnight Blue</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- ===== STICKY NAVIGATION BAR ===== -->
@@ -14,7 +15,7 @@
                 <span class="nav-brand">DFA Simulator</span>
             </div> -->
             <div class="nav-center">
-                <button class="nav-btn active" id="nav-dfa" onclick="switchSection('dfa-regex')">DFA &amp; Regex</button>
+                <button class="nav-btn active" id="nav-dfa-regex" onclick="switchSection('dfa-regex')">Regex &amp; DFA</button>
                 <button class="nav-btn" id="nav-cfg" onclick="switchSection('cfg')">CFG</button>
                 <button class="nav-btn" id="nav-pda" onclick="switchSection('pda')">PDA</button>
             </div>
@@ -40,7 +41,7 @@
                     <div class="regex-display">
                         <code>(bab)*(b+a)(bab+aba)(a+b)*(aa+bb)*(b+a+bb)(a+b)*(aa+bb)</code>
                     </div>
-                    <p class="sample-label">Sample valid strings</p>
+                    <p class="sample-label">Sample valid strings:</p>
                     <ul class="sample-list">
                         <li><code>bababaa</code></li>
                         <li><code>bbabababb</code></li>
@@ -70,7 +71,7 @@
                     <div class="tape-panel" id="tape-panel-1">
                         <div class="tape-title">Tape 1</div>
                         <div class="tape-cells" id="tape-cells-1">
-                            <span class="tape-placeholder">Enter a string and run the simulation</span>
+                            <span class="tape-placeholder">Enter a string and run the simulation.</span>
                         </div>
                     </div>
                     <div class="svg-container">
@@ -119,7 +120,7 @@
                         <h3>Execution</h3>
                         <div class="ctrl-btn-group">
                             <button class="btn btn-run" id="run2-btn" onclick="startValidation(2)">Run</button>
-                            <button class="btn btn-step" id="step2-btn" onclick=
+                            <button class="btn btn-step" id="step2-btn" onclick="manualStep(2)">Step</button>
                             <button class="btn btn-back" id="back2-btn" onclick="stepBack(2)" disabled>Back</button>
                         </div>
                         <button class="btn btn-reset full-width" id="reset2-btn" onclick="resetSimulation(2)">Reset</button>
@@ -145,8 +146,7 @@ D → a D | b D | ε
 E → aa E | bb E | ε
 F → a | b | bb
 G → a G | b G | ε
-H → aa | bb
-                    </pre>
+H → aa | bb</pre>
                 </div>
             </div>
             <div class="cfg-single" id="cfg-regex-2" style="display:none;">
@@ -163,8 +163,7 @@ F → 101 | 111
 G → 101 G | 111 G | ε
 H → 1 | Z | 11
 I → H I | ε
-Z → 0 Z | ε
-                    </pre>
+Z → 0 Z | ε</pre>
                 </div>
             </div>
         </section>
@@ -181,9 +180,9 @@ Z → 0 Z | ε
                             <button class="btn btn-zoom-reset" onclick="pdaResetView('pda-viewport-1')" title="Reset View">Reset View</button>
                         </div>
                         <div class="pda-viewport" id="pda-viewport-1">
-                            <img src="pda1.png" alt="PDA for RE 1" class="pda-zoomable-img" id="pda-img-1"
-                                 onerror="this.style.display='none'; this.parentNode.querySelector('.img-fallback').style.display='flex';">
-                            <div class="img-fallback" style="display:none;">
+                            <img src="Images/pda1-dark.png" alt="PDA for RE 1" class="pda-zoomable-img" id="pda-img-1"
+                                onerror="this.style.display='none'; this.parentNode.querySelector('.img-fallback').style.display='flex';">
+                                <div class="img-fallback" style="display:none;">
                                 <p>Place <code>pda1.png</code> in the same folder.</p>
                             </div>
                         </div>

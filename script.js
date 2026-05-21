@@ -155,6 +155,8 @@ function toggleTheme() {
         var dfa = dfaNum === 1 ? dfa1 : dfa2;
         drawDFA(dfa, 'dfa' + dfaNum + '-svg', simulation.path, simulation.stepIndex, getFinalResult());
     }
+    var isDark = !body.classList.contains('light-theme');
+    document.getElementById('pda-img-1').src = isDark ? 'Images/pda1-dark.png' : 'Images/pda1-light.png';
 }
 
 // =======================================================
@@ -167,6 +169,8 @@ window.onload = function() {
     applySubTab(1);
     initPDAZoom('pda-viewport-1');
     initPDAZoom('pda-viewport-2');
+    var isDark = !document.body.classList.contains('light-theme');
+    document.getElementById('pda-img-1').src = isDark ? 'Images/pda1-dark.png' : 'Images/pda1-light.png';
 };
 
 // =======================================================
@@ -1010,5 +1014,6 @@ function applyPDATransform(viewportId) {
     var img = vp.querySelector('.pda-zoomable-img');
     if (img) {
         img.style.transform = 'scale(' + state.scale + ') translate(' + state.translateX + 'px, ' + state.translateY + 'px)';
+        img.style.transformOrigin = 'center center';
     }
 }
