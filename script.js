@@ -398,9 +398,23 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
         var t = dfa.transitions[i];
         var from = t[0], symbol = t[1], to = t[2];
         var isActive = (from === activeFrom && to === activeTo && symbol === activeSym);
-        var color = isActive ? edgeActive : edgeBase;
-        var width = isActive ? '3' : '1.8';
-        var markerId = isActive ? mActive : mNorm;
+        // Check if this edge was already traversed in the path
+        var isTraversed = false;
+        if (path && stepIndex > 0) {
+            for (var ti = 0; ti < stepIndex && ti + 1 < path.length; ti++) {
+                if (path[ti] === from && path[ti + 1] === to) {
+                    // Also verify the symbol matches
+                    var expectedSym = simulation.input ? simulation.input[ti] : '';
+                    if (expectedSym === symbol) {
+                        isTraversed = true;
+                        break;
+                    }
+                }
+            }
+        }
+        var color = isActive ? edgeActive : (isTraversed ? edgeActive : edgeBase);
+        var width = isActive ? '3.5' : (isTraversed ? '2.5' : '1.8');
+        var markerId = isActive ? mActive : (isTraversed ? mActive : mNorm);
 
         // ---------- SELF-LOOPS ----------
         if (from === to) {
