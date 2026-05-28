@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --win"
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win"
   },
   "build": {
     "appId": "com.stateflow.automata",
@@ -19,6 +20,9 @@
       "main.js",
       "Images/**/*"
     ],
+    "mac": {
+      "target": "dmg"
+    },
     "win": {
       "target": "nsis"
     },
@@ -30,8 +34,8 @@
       "shortcutName": "StateFlow"
     }
   },
-"devDependencies": {
-  "electron": "latest",
-  "electron-builder": "latest"
-}
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  }
 }
