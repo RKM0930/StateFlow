@@ -41,12 +41,14 @@
                     <div class="regex-display">
                         <code>(bab)*(b+a)(bab+aba)(a+b)*(aa+bb)*(b+a+bb)(a+b)*(aa+bb)</code>
                     </div>
-                    <p class="sample-label">Sample valid strings:</p>
-                    <ul class="sample-list">
-                        <li><code>bababaa</code></li>
-                        <li><code>bbabababb</code></li>
-                        <li><code>ababaaabb</code></li>
-                    </ul>
+<div class="sample-row">
+    <p class="sample-label">Sample valid strings:</p>
+    <ul class="sample-list">
+        <li><code>bababaa</code></li>
+        <li><code>bbabababb</code></li>
+        <li><code>ababaaabb</code></li>
+    </ul>
+</div>
                 </div>
             </div>
 
@@ -56,12 +58,14 @@
                     <div class="regex-display">
                         <code>(1+0)*(11+00)(00+11)*(1+0+11)(1+0+11)*(101+111)(101+111)*(1+0*+11)(1+0*+11)*</code>
                     </div>
-                    <p class="sample-label">Sample valid strings</p>
-                    <ul class="sample-list">
-                        <li><code>110111010000111</code></li>
-                        <li><code>111000111010</code></li>
-                        <li><code>101000101011</code></li>
-                    </ul>
+<div class="sample-row">
+    <p class="sample-label">Sample valid strings:</p>
+    <ul class="sample-list">
+        <li><code>110111010000111</code></li>
+        <li><code>111000111010</code></li>
+        <li><code>101000101011</code></li>
+    </ul>
+</div>
                 </div>
             </div>
 
@@ -134,11 +138,17 @@
 
         <!-- ============ CFG SECTION ============ -->
         <section class="section-content" id="section-cfg">
+
+            <!-- CFG FOR REGEX 1 -->
             <div class="cfg-single" id="cfg-regex-1">
                 <div class="card">
-                    <h2>Context‑Free Grammar – RE 1</h2>
-                    <pre class="cfg-display">
-S → A B C D E F G H
+                    <h2>Context-Free Grammar – RE 1</h2>
+
+                    <div class="cfg-grid">
+                        <!-- LEFT SIDE: CFG RULES -->
+                        <div class="cfg-box">
+                            <h3>CFG Rules</h3>
+                            <pre class="cfg-display">S → A B C D E F G H
 A → bab A | ε
 B → a | b
 C → bab | aba
@@ -147,13 +157,52 @@ E → aa E | bb E | ε
 F → a | b | bb
 G → a G | b G | ε
 H → aa | bb</pre>
+                        </div>
+
+                        <!-- RIGHT SIDE: SAMPLE DERIVATION -->
+                        <div class="cfg-box">
+                            <h3>Detailed Sample Derivation</h3>
+
+                            <div class="derivation-meta">
+                                <p><strong>Sample string:</strong> <code>bababaa</code></p>
+                            </div>
+
+                            <pre class="cfg-display derivation-display">Chosen productions:
+A → ε
+B → b
+C → aba
+D → ε
+E → ε
+F → b
+G → ε
+H → aa
+
+Step-by-step derivation:
+S → A B C D E F G H
+  → ε B C D E F G H
+  → b C D E F G H
+  → b aba D E F G H
+  → b aba ε E F G H
+  → b aba ε ε F G H
+  → b aba ε ε b G H
+  → b aba ε ε b ε H
+  → b aba ε ε b ε aa
+  → bababaa</pre>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- CFG FOR REGEX 2 -->
             <div class="cfg-single" id="cfg-regex-2" style="display:none;">
                 <div class="card">
-                    <h2>Context‑Free Grammar – RE 2</h2>
-                    <pre class="cfg-display">
-S → A B C D E F G H I
+                    <h2>Context-Free Grammar – RE 2</h2>
+
+                    <div class="cfg-grid">
+                        <!-- LEFT SIDE: CFG RULES -->
+                        <div class="cfg-box">
+                            <h3>CFG Rules</h3>
+                            <pre class="cfg-display">S → A B C D E F G H I
 A → 0 A | 1 A | ε
 B → 11 | 00
 C → 00 C | 11 C | ε
@@ -164,8 +213,44 @@ G → 101 G | 111 G | ε
 H → 1 | Z | 11
 I → H I | ε
 Z → 0 Z | ε</pre>
+                        </div>
+
+                        <!-- RIGHT SIDE: SAMPLE DERIVATION -->
+                        <div class="cfg-box">
+                            <h3>Detailed Sample Derivation</h3>
+
+                            <div class="derivation-meta">
+                                <p><strong>Sample string:</strong> <code>1111011</code></p>
+                            </div>
+
+                            <pre class="cfg-display derivation-display">Chosen productions:
+A → ε
+B → 11
+C → ε
+D → 1
+E → ε
+F → 101
+G → ε
+H → 1
+I → ε
+
+Step-by-step derivation:
+S → A B C D E F G H I
+  → ε B C D E F G H I
+  → 11 C D E F G H I
+  → 11 ε D E F G H I
+  → 11 1 E F G H I
+  → 11 1 ε F G H I
+  → 11 1 101 G H I
+  → 11 1 101 ε H I
+  → 11 1 101 1 I
+  → 11 1 101 1 ε
+  → 1111011</pre>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </section>
 
         <!-- ============ PDA SECTION ============ -->
@@ -199,7 +284,7 @@ Z → 0 Z | ε</pre>
                             <button class="btn btn-zoom-reset" onclick="pdaResetView('pda-viewport-2')" title="Reset View">Reset View</button>
                         </div>
                         <div class="pda-viewport" id="pda-viewport-2">
-                            <img src="pda2.png" alt="PDA for RE 2" class="pda-zoomable-img" id="pda-img-2"
+                            <img src="Images/pda2-dark.png" alt="PDA for RE 2" class="pda-zoomable-img" id="pda-img-2"
                                  onerror="this.style.display='none'; this.parentNode.querySelector('.img-fallback').style.display='flex';">
                             <div class="img-fallback" style="display:none;">
                                 <p>Place <code>pda2.png</code> in the same folder.</p>

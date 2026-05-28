@@ -1,5 +1,5 @@
 /* ============================================================
-   MIDNIGHT BLUE THEME – polished, elegant, educational
+   MIDNIGHT BLUE THEME â€“ polished, elegant, educational
    ============================================================ */
 * {
     margin: 0;
@@ -25,52 +25,61 @@ pre, code, input, button, textarea {
     --text:           #e4ecf5;
     --text-secondary: #9badc4;
     --text-muted:     #6a7f99;
-    --accent-blue:    #3b7ddd;
+
     --accent-blue:    #0ea5a0;
     --accent-blue-lit:#2dd4bf;
+
     --green-run:      #0d9870;
     --green-hover:    #10b981;
     --blue-step:      #0e78a5;
     --blue-hover:     #1397c0;
     --orange-reset:   #ce7f0f;
     --orange-hover:   #e8944a;
+
     --glow-blue:      #14b8a6;
     --glow-green:     #34d399;
     --glow-red:       #e05555;
+
     --shadow-sm:      0 2px 8px rgba(0,0,0,0.25);
     --shadow-lg:      0 4px 20px rgba(0,0,0,0.35);
+
     --radius:         12px;
     --radius-sm:      8px;
     --panel-width:    300px;
     --nav-height:     56px;
 }
-
 /* Light theme overrides */
 body.light-theme {
-    --bg-deep:        #f4fafa;
+    --bg-deep:        #f5f7fa;
     --bg-surface:     #ffffff;
     --bg-card:        #f0f3f8;
-    --bg-input:       #e9edf2;
+    --bg-input:       #ffffff;
     --border:         #d0d7e2;
     --border-light:   #dce2eb;
     --text:           #1a1f2e;
     --text-secondary: #3d4a5e;
     --text-muted:     #69738a;
+
+    /* Same accent/highlight colors as dark mode */
     --accent-blue:    #0ea5a0;
     --accent-blue-lit:#2dd4bf;
+
+    /* Same button colors as dark mode */
     --green-run:      #0d9870;
     --green-hover:    #10b981;
     --blue-step:      #0e78a5;
     --blue-hover:     #1397c0;
-    --orange-reset:   #de9504;
+    --orange-reset:   #ce7f0f;
     --orange-hover:   #e8944a;
+
+    /* Same tape/highlight glow colors as dark mode */
     --glow-blue:      #14b8a6;
     --glow-green:     #34d399;
     --glow-red:       #e05555;
+
     --shadow-sm:      0 2px 8px rgba(0,0,0,0.05);
     --shadow-lg:      0 4px 16px rgba(0,0,0,0.08);
 }
-
 body {
     font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
     background: var(--bg-deep);
@@ -217,7 +226,7 @@ body.light-theme .nav-btn:hover {
     margin-bottom: 0;
 }
 
-/* ===== TWO‑COLUMN LAYOUT ===== */
+/* ===== TWOâ€‘COLUMN LAYOUT ===== */
 .two-column {
     display: flex;
     gap: 16px;
@@ -267,8 +276,8 @@ body.light-theme .canvas-area {
 }
 
 body.light-theme .tape-panel {
-    background: linear-gradient(135deg, #0ea5a0, #10b981);
-    border-color: #a9bebd;
+    background: #ffffff;
+    border-color: #d0d7e2;
 }
 
 
@@ -282,7 +291,7 @@ body.light-theme .tape-panel {
 }
 
 body.light-theme .tape-title {
-    color: #ffffff;
+    color: #3d4a5e;
 }
 
 .tape-cells {
@@ -300,7 +309,7 @@ body.light-theme .tape-title {
 }
 
 body.light-theme .tape-placeholder {
-    color: rgba(255,255,255,0.85);
+    color: #69738a;
 }
 
 .tape-cell {
@@ -343,6 +352,29 @@ body.light-theme .tape-cell {
     box-shadow: 0 0 8px var(--glow-red);
 }
 
+/* Keep tape highlights exactly the same in light mode */
+body.light-theme .tape-cell.active {
+    background: #0ea5a0;
+    border-color: #2dd4bf;
+    color: #ffffff;
+    box-shadow: 0 0 8px #14b8a6;
+}
+
+body.light-theme .tape-cell.accepted {
+    background: #34d399;
+    border-color: #38b568;
+    color: #ffffff;
+    box-shadow: 0 0 8px #34d399;
+}
+
+body.light-theme .tape-cell.rejected {
+    background: #e05555;
+    border-color: #e05555;
+    color: #ffffff;
+    box-shadow: 0 0 8px #e05555;
+}
+
+
 /* ===== CONTROL PANEL ===== */
 .control-panel {
     width: var(--panel-width);
@@ -383,7 +415,7 @@ body.light-theme .panel-section h3 {
 .panel-section input:focus {
     outline: none;
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px rgba(59,125,221,0.15);
+    box-shadow: 0 0 0 3px rgba(14,165,160,0.18);
 }
 
 /* ===== BUTTONS ===== */
@@ -506,12 +538,13 @@ body.light-theme .card h2 {
 }
 
 body.light-theme .regex-display {
-    background: linear-gradient(135deg, #0ea5a0, #10b981);
-    border-left-color: #107892;
+    background: #ffffff;
+    border: 1px solid #d0d7e2;
+    border-left: 4px solid #1e3146;
 }
 
 body.light-theme .regex-display code {
-    color: #ffffff;
+    color: #1a1f2e;
 }
 
 .regex-display code {
@@ -521,25 +554,37 @@ body.light-theme .regex-display code {
     word-break: break-word;
 }
 
+.sample-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
 .sample-label {
     color: var(--text-secondary);
     font-weight: 500;
     font-size: 0.85rem;
-    margin-bottom: 4px;
+    margin: 0;
+    white-space: nowrap;
 }
 
 .sample-list {
     list-style: none;
     padding-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
 }
 
 .sample-list li {
-    padding: 2px 0;
+    padding: 0;
 }
 
 .sample-list code {
     background: #162433;
-    padding: 2px 8px;
+    padding: 4px 10px;
     border-radius: 4px;
     font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
     font-size: 0.85rem;
@@ -569,8 +614,114 @@ body.light-theme .sample-list code {
 }
 
 body.light-theme .cfg-display {
-    background: linear-gradient(135deg, #0ea5a0, #10b981);
-    color: #ffffff;
+    background: #ffffff;
+    color: #1a1f2e;
+    border: 1px solid #d0d7e2;
+}
+
+/* ===== CFG TWO-COLUMN LAYOUT ===== */
+.cfg-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: start;
+}
+
+.cfg-box {
+    min-width: 0;
+}
+
+.cfg-box h3 {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.derivation-meta {
+    background: #101c2a;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    color: var(--text);
+}
+
+.derivation-meta p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.derivation-meta code {
+    background: #162433;
+    color: #dce8f5;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.derivation-display {
+    height: 360px;
+    max-height: 360px;
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    padding-right: 14px;
+    scroll-behavior: smooth;
+}
+
+.derivation-display::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.derivation-display::-webkit-scrollbar-track {
+    background: #0b1622;
+    border-radius: 10px;
+}
+
+.derivation-display::-webkit-scrollbar-thumb {
+    background: #2d4a6a;
+    border-radius: 10px;
+}
+
+.derivation-display::-webkit-scrollbar-thumb:hover {
+    background: #3b638f;
+}
+
+body.light-theme .derivation-display::-webkit-scrollbar-track {
+    background: #dce2eb;
+}
+
+body.light-theme .derivation-display::-webkit-scrollbar-thumb {
+    background: #1e3146;
+}
+
+body.light-theme .derivation-display::-webkit-scrollbar-thumb:hover {
+    background: #2d4a6a;
+}
+
+body.light-theme .cfg-box h3 {
+    color: #3d4a5e;
+}
+
+body.light-theme .derivation-meta {
+    background: #ffffff;
+    border-color: #d0d7e2;
+    color: #1a1f2e;
+}
+
+body.light-theme .derivation-meta code {
+    background: #dce2eb;
+    color: #1a1f2e;
+}
+
+@media (max-width: 900px) {
+    .cfg-grid {
+        grid-template-columns: 1fr;
+    }
 }
 .pda-container {
     text-align: center;
@@ -612,15 +763,16 @@ body.light-theme .cfg-display {
     cursor: grab;
     position: relative;
     height: 500px;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;    
+    padding: 20px;
 }
 
 body.light-theme .pda-viewport {
-    background: linear-gradient(135deg, #0ea5a0, #10b981);
-    border-color: #a9bebd;
+    background: #ffffff;
+    border-color: #d0d7e2;
 }
 
 .pda-viewport:active {
@@ -628,13 +780,16 @@ body.light-theme .pda-viewport {
 }
 
 .pda-zoomable-img {
-    max-width: 60%;        /* shrink to show full diagram */
-    max-height: 100%;
-    height: auto;
+    width: 60%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
     object-fit: contain;
+    object-position: center center;
     display: block;
     margin: auto;
-    transform-origin: center center;  /* zoom from center */
+    flex-shrink: 0;
+    transform-origin: center center;
 }
 
 .img-fallback {
@@ -647,7 +802,8 @@ body.light-theme .pda-viewport {
 }
 
 body.light-theme .img-fallback {
-    background: #e9edf2;
+    background: #ffffff;
+    border-color: #d0d7e2;
     color: #1a1f2e;
 }
 
@@ -692,5 +848,14 @@ svg line {
     }
     body {
         padding-top: 90px;
+    }
+
+    .pda-viewport {
+        height: 420px;
+    }
+
+    .pda-zoomable-img {
+        width: 90%;
+        height: 100%;
     }
 }

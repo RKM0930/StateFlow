@@ -132,35 +132,54 @@ var currentSubTab = 1;
 var currentSection = 'dfa-regex';
 
 // =======================================================
-// THEME MANAGEMENT (unchanged)
+// THEME MANAGEMENT
 // =======================================================
 (function() {
     var savedTheme = localStorage.getItem('dfa-theme');
+
     if (savedTheme === 'light') {
         document.body.classList.add('light-theme');
         document.getElementById('theme-icon').textContent = '☾';
     } else {
+        document.body.classList.remove('light-theme');
         document.getElementById('theme-icon').textContent = '☀';
     }
 })();
 
+function updatePDAImages() {
+    var isDark = !document.body.classList.contains('light-theme');
+
+    var pda1Img = document.getElementById('pda-img-1');
+    var pda2Img = document.getElementById('pda-img-2');
+
+    if (pda1Img) {
+        pda1Img.src = isDark ? 'Images/pda1-dark.png' : 'Images/pda1-light.png';
+    }
+
+    if (pda2Img) {
+        pda2Img.src = isDark ? 'Images/pda2-dark.png' : 'Images/pda2-light.png';
+    }
+}
+
 function toggleTheme() {
     var body = document.body;
     body.classList.toggle('light-theme');
+
     var isLight = body.classList.contains('light-theme');
     localStorage.setItem('dfa-theme', isLight ? 'light' : 'dark');
     document.getElementById('theme-icon').textContent = isLight ? '☾' : '☀';
+
     if (currentSection === 'dfa-regex') {
         var dfaNum = currentSubTab;
         var dfa = dfaNum === 1 ? dfa1 : dfa2;
         drawDFA(dfa, 'dfa' + dfaNum + '-svg', simulation.path, simulation.stepIndex, getFinalResult());
     }
-    var isDark = !body.classList.contains('light-theme');
-    document.getElementById('pda-img-1').src = isDark ? 'Images/pda1-dark.png' : 'Images/pda1-light.png';
+
+    updatePDAImages();
 }
 
 // =======================================================
-// INIT (unchanged)
+// INIT
 // =======================================================
 window.onload = function() {
     drawDFA(dfa1, 'dfa1-svg', [], 0, null);
@@ -169,8 +188,7 @@ window.onload = function() {
     applySubTab(1);
     initPDAZoom('pda-viewport-1');
     initPDAZoom('pda-viewport-2');
-    var isDark = !document.body.classList.contains('light-theme');
-    document.getElementById('pda-img-1').src = isDark ? 'Images/pda1-dark.png' : 'Images/pda1-light.png';
+    updatePDAImages();
 };
 
 // =======================================================
@@ -398,9 +416,23 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
         var t = dfa.transitions[i];
         var from = t[0], symbol = t[1], to = t[2];
         var isActive = (from === activeFrom && to === activeTo && symbol === activeSym);
-        var color = isActive ? edgeActive : edgeBase;
-        var width = isActive ? '3' : '1.8';
-        var markerId = isActive ? mActive : mNorm;
+        // Check if this edge was already traversed in the path
+        var isTraversed = false;
+        if (path && stepIndex > 0) {
+            for (var ti = 0; ti < stepIndex && ti + 1 < path.length; ti++) {
+                if (path[ti] === from && path[ti + 1] === to) {
+                    // Also verify the symbol matches
+                    var expectedSym = simulation.input ? simulation.input[ti] : '';
+                    if (expectedSym === symbol) {
+                        isTraversed = true;
+                        break;
+                    }
+                }
+            }
+        }
+        var color = isActive ? edgeActive : (isTraversed ? edgeActive : edgeBase);
+        var width = isActive ? '3.5' : (isTraversed ? '2.5' : '1.8');
+        var markerId = isActive ? mActive : (isTraversed ? mActive : mNorm);
 
         // ---------- SELF-LOOPS ----------
         if (from === to) {
@@ -666,26 +698,25 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
         lbl.setAttribute("text-anchor", "middle"); lbl.setAttribute("dominant-baseline", "central");
         lbl.setAttribute("font-size", "12"); lbl.setAttribute("font-weight", "700");
         lbl.setAttribute("fill", (fill === glowGreen || fill === glowRed) ? '#ffffff' : labelFill);
-        // Custom state labels
-        var stateLabels = {
-            0: '-',
-            1: 's1',
-            2: 'q1',
-            3: 'q2',
-            4: 'q3',
-            5: 'r1',
-            6: 'r2',
-            7: 'r3',
-            8: 't1',
-            9: 't2',
-            10: 't3',
-            11: '+',
-            12: 's2',
-            13: 's3',
-            14: 'T',
-            15: '+'
-        };
-        lbl.textContent = stateLabels[state] !== undefined ? stateLabels[state] : 'q' + state;
+        // Consistent DFA labels
+        // Start state uses "-"
+        // Final/accepting states use "+"
+        // DFA 1 trap state uses "T"
+        // DFA 2 visually swaps q6 and q7 labels to match the reference DFA
+        // All other normal states use qN
+        if (state === dfa.start) {
+            lbl.textContent = '-';
+        } else if (dfa.accept.indexOf(state) !== -1) {
+            lbl.textContent = '+';
+        } else if (svgId === 'dfa1-svg' && state === 14) {
+            lbl.textContent = 'T';
+        } else if (svgId === 'dfa2-svg' && state === 6) {
+            lbl.textContent = 'q7';
+        } else if (svgId === 'dfa2-svg' && state === 7) {
+            lbl.textContent = 'q6';
+        } else {
+            lbl.textContent = 'q' + state;
+        }
         g.appendChild(lbl);     
         graphGroup.appendChild(g);
     }
@@ -693,10 +724,18 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
     // Entry arrow
     var sp = pos[dfa.start];
     var sa = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    sa.setAttribute("x1", sp.x - 28); sa.setAttribute("y1", sp.y);
-    sa.setAttribute("x2", sp.x - R - 1); sa.setAttribute("y2", sp.y);
-    sa.setAttribute("stroke", edgeBase); sa.setAttribute("stroke-width", "1.8");
-    sa.setAttribute("marker-end", "url(#" + mNorm + ")"); graphGroup.appendChild(sa);
+
+    sa.setAttribute("x1", sp.x - 55);
+    sa.setAttribute("y1", sp.y);
+    sa.setAttribute("x2", sp.x - R - 4);
+    sa.setAttribute("y2", sp.y);
+
+    sa.setAttribute("stroke", edgeBase);
+    sa.setAttribute("stroke-width", "2.2");
+    sa.setAttribute("stroke-linecap", "round");
+    sa.setAttribute("marker-end", "url(#" + mNorm + ")");
+
+    graphGroup.appendChild(sa);
 
     // Update tape if simulation is active
     if (simulation.dfaNum && simulation.input && simulation.path.length > 0)
