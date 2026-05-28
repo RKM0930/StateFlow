@@ -1,0 +1,37 @@
+{
+  "name": "stateflow",
+  "version": "1.0.0",
+  "description": "StateFlow Automata Simulator",
+  "main": "main.js",
+  "author": "StateFlow Team",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.stateflow.automata",
+    "productName": "StateFlow",
+    "files": [
+      "index.html",
+      "style.css",
+      "script.js",
+      "main.js",
+      "Images/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "StateFlow"
+    }
+  },
+  "devDependencies": {
+    "electron": "^latest",
+    "electron-builder": "^latest"
+  }
+}
