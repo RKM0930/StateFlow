@@ -56,63 +56,83 @@ var dfa1 = {
         [15,"a",9], [15,"b",15],
     ],
     positions: {
-        0: {x:60,   y:100},   // - (start)  Row1 Col1
-        1: {x:60,   y:500},   // s1         Row4 Col1
-        2: {x:220,  y:100},   // q1         Row1 Col2
-        3: {x:540,  y:100},   // q2         Row1 Col4
-        4: {x:700,  y:100},   // q3         Row1 Col5
-        5: {x:220,  y:260},   // r1         Row2 Col2
-        6: {x:540,  y:260},   // r2         Row2 Col4
-        7: {x:700,  y:260},   // r3         Row2 Col5
-        8: {x:860,  y:260},   // t1         Row2 Col6
-        9: {x:1020, y:100},   // t2         Row1 Col7
-        10:{x:1020, y:500},    // t3         Row4 Col7
-        11:{x:1180, y:100},   // x1+        Row1 Col8
-        12:{x:220,  y:500},   // s2         Row4 Col2
-        13:{x:540,  y:500},      // s3         Row4 Col4
-        14:{x:380,  y:380},   // T (trap)   Row3 Col3
-        15:{x:1180, y:500},   // x2+        Row4 Col8
+        0: {x:60,   y:100},   // - (start)  
+        1: {x:60,   y:500},   // s1         
+        2: {x:220,  y:100},   // q1        
+        3: {x:540,  y:100},   // q2        
+        4: {x:700,  y:100},   // q3         
+        5: {x:220,  y:260},   // r1         
+        6: {x:540,  y:260},   // r2         
+        7: {x:700,  y:260},   // r3         
+        8: {x:860,  y:260},   // t1         
+        9: {x:1020, y:100},   // t2         
+        10:{x:1020, y:500},   // t3         
+        11:{x:1180, y:100},   // x1+        
+        12:{x:220,  y:500},   // s2         
+        13:{x:540,  y:500},   // s3         
+        14:{x:380,  y:380},   // T (trap)   
+        15:{x:1180, y:500},   // x2+        
     },
-    transform: { dx: 20, dy: 20, scale: 1.4 }
+    transform: { dx: 20, dy: 20, scale: 1.4 },
+    // Per-DFA state labels — two accept states, one trap state T
+    stateLabels: {
+        0: '-',  1: 's1', 2: 'q1',  3: 'q2',
+        4: 'q3', 5: 'r1', 6: 'r2',  7: 'r3',
+        8: 't1', 9: 't2', 10: 't3', 11: '+',
+        12: 's2', 13: 's3', 14: 'T', 15: '+'
+    }
 };
 
 var dfa2 = {
     states: [0,1,2,3,4,5,6,7,8],
     alphabet: ['0', '1'],
     start: 0,
-    accept: [8],
+    accept: [8],  // t1+ = 8
     transitions: [
-        [0,"0",1],
-        [0,"1",2],
-        [1,"0",3],
-        [1,"1",2],
-        [2,"0",1],
-        [2,"1",3],
-        [3,"0",4],
-        [3,"1",4],
-        [4,"0",4],
-        [4,"1",5],
-        [5,"0",6],
-        [5,"1",7],
-        [6,"0",4],
-        [6,"1",8],
-        [7,"0",6],
-        [7,"1",8],
-        [8,"0",8],
-        [8,"1",8]
+        // - (0): 0→s1(1), 1→q1(2)
+        [0,"0",1], [0,"1",2],
+
+        // s1 (1): 0→q2(3), 1→q1(2)
+        [1,"0",3], [1,"1",2],
+
+        // q1 (2): 0→s1(1), 1→q2(3)
+        [2,"0",1], [2,"1",3],
+
+        // q2 (3): 0→q3(4), 1→q3(4)
+        [3,"0",4], [3,"1",4],
+
+        // q3 (4): 0→q3(4), 1→r1(5)
+        [4,"0",4], [4,"1",5],
+
+        // r1 (5): 0→r2(6), 1→r3(7)
+        [5,"0",6], [5,"1",7],
+
+        // r2 (6): 0→q3(4), 1→t1+(8)
+        [6,"0",4], [6,"1",8],
+
+        // r3 (7): 0→r2(6), 1→t1+(8)
+        [7,"0",6], [7,"1",8],
+
+        // t1+ (8): 0→t1+(8), 1→t1+(8)
+        [8,"0",8], [8,"1",8]
     ],
     positions: {
-        0: { x: 60,  y: 260 },
-        1: { x: 200, y: 110 },
-        2: { x: 200, y: 410 },
-        3: { x: 360, y: 260 },
-        4: { x: 520, y: 260 },
-        5: { x: 680, y: 260 },
-        6: { x: 840, y: 110 },
-        7: { x: 840, y: 410 },
-        8: { x: 1020, y: 260 }
+        0: { x: 60,  y: 260 },   // - (start)
+        1: { x: 200, y: 110 },   // s1
+        2: { x: 200, y: 410 },   // q1
+        3: { x: 360, y: 260 },   // q2
+        4: { x: 520, y: 260 },   // q3
+        5: { x: 680, y: 260 },   // r1
+        6: { x: 840, y: 110 },   // r2
+        7: { x: 840, y: 410 },   // r3
+        8: { x: 1020, y: 260 }   // t1+ (accept)
     },
-    transform: { dx: -10, dy: -20, scale: 1.2 }
+    transform: { dx: -10, dy: -20, scale: 1.2 },
+    stateLabels: {
+        0: '-',  1: 'q1', 2: 'q2', 3: 'q3',
+        4: 's1', 5: 'r1', 6: 'r2', 7: 'r3',
+        8: '+'
+    }
 };
 
 // =======================================================
@@ -433,6 +453,23 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
         var color = isActive ? edgeActive : (isTraversed ? edgeActive : edgeBase);
         var width = isActive ? '3.5' : (isTraversed ? '2.5' : '1.8');
         var markerId = isActive ? mActive : (isTraversed ? mActive : mNorm);
+        // Check if this edge was already traversed in the path
+        var isTraversed = false;
+        if (path && stepIndex > 0) {
+            for (var ti = 0; ti < stepIndex && ti + 1 < path.length; ti++) {
+                if (path[ti] === from && path[ti + 1] === to) {
+                    // Also verify the symbol matches
+                    var expectedSym = simulation.input ? simulation.input[ti] : '';
+                    if (expectedSym === symbol) {
+                        isTraversed = true;
+                        break;
+                    }
+                }
+            }
+        }
+        var color = isActive ? edgeActive : (isTraversed ? edgeActive : edgeBase);
+        var width = isActive ? '3.5' : (isTraversed ? '2.5' : '1.8');
+        var markerId = isActive ? mActive : (isTraversed ? mActive : mNorm);
 
         // ---------- SELF-LOOPS ----------
         if (from === to) {
@@ -444,6 +481,24 @@ function drawDFA(dfa, svgId, path, stepIndex, finalResult) {
                 }
             }
             if (alreadyDrawn) continue; // skip second self-loop, already drawn combined
+
+            // ---------- SELF-LOOP TRAVERSAL CHECK ----------
+            // Standard isTraversed check fails for self-loops because combined
+            // a,b labels are drawn as one edge; instead check for consecutive
+            // identical states in the path to determine if loop was traversed.
+            var selfLoopTraversed = false;
+            if (path && stepIndex > 0) {
+                for (var ti = 0; ti < stepIndex && ti + 1 < path.length; ti++) {
+                    if (path[ti] === from && path[ti + 1] === from) {
+                        selfLoopTraversed = true;
+                        break;
+                    }
+                }
+            }
+            // Override edge styling variables set above for non-self-loop edges
+            var color = selfLoopTraversed ? edgeActive : edgeBase;
+            var width = selfLoopTraversed ? '2.5' : '1.8';
+            var markerId = selfLoopTraversed ? mActive : mNorm;
 
             // Collect all self-loop symbols for this state
             var selfSymbols = [];
