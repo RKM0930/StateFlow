@@ -30,8 +30,8 @@
       "shortcutName": "StateFlow"
     }
   },
-  "devDependencies": {
-    "electron": "^latest",
-    "electron-builder": "^latest"
-  }
+"devDependencies": {
+  "electron": "latest",
+  "electron-builder": "latest"
+}
 }
