@@ -31,9 +31,9 @@
 
     <!-- ===== MAIN CONTENT ===== -->
     <main class="main-container">
-
         <!-- ============ DFA & REGEX SECTION ============ -->
         <section class="section-content active" id="section-dfa-regex">
+
             <!-- Regex info cards -->
             <div class="regex-info-card" id="regex-info-1">
                 <div class="card">
@@ -41,14 +41,14 @@
                     <div class="regex-display">
                         <code>(bab)*(b+a)(bab+aba)(a+b)*(aa+bb)*(b+a+bb)(a+b)*(aa+bb)</code>
                     </div>
-<div class="sample-row">
-    <p class="sample-label">Sample valid strings:</p>
-    <ul class="sample-list">
-        <li><code>bababaa</code></li>
-        <li><code>bbabababb</code></li>
-        <li><code>ababaaabb</code></li>
-    </ul>
-</div>
+                    <div class="sample-row">
+                        <p class="sample-label">Sample valid strings:</p>
+                        <ul class="sample-list">
+                            <li><code>bababaa</code></li>
+                            <li><code>bbabababb</code></li>
+                            <li><code>ababaaabb</code></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -58,19 +58,20 @@
                     <div class="regex-display">
                         <code>(1+0)*(11+00)(00+11)*(1+0+11)(1+0+11)*(101+111)(101+111)*(1+0*+11)(1+0*+11)*</code>
                     </div>
-<div class="sample-row">
-    <p class="sample-label">Sample valid strings:</p>
-    <ul class="sample-list">
-        <li><code>110111010000111</code></li>
-        <li><code>111000111010</code></li>
-        <li><code>101000101011</code></li>
-    </ul>
-</div>
+                    <div class="sample-row">
+                        <p class="sample-label">Sample valid strings:</p>
+                        <ul class="sample-list">
+                            <li><code>110111010000111</code></li>
+                            <li><code>111000111010</code></li>
+                            <li><code>101000101011</code></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
             <!-- Two-column workspace for Regex 1 -->
             <div class="two-column" id="two-column-1">
+
                 <div class="canvas-area">
                     <div class="tape-panel" id="tape-panel-1">
                         <div class="tape-title">Tape 1</div>
@@ -82,28 +83,43 @@
                         <svg id="dfa1-svg" viewBox="0 0 1800 800"></svg>
                     </div>
                 </div>
-                <div class="control-panel">
-                    <div class="panel-section">
-                        <h3>Input String</h3>
-                        <input type="text" id="input1" placeholder="e.g., bababaa" autocomplete="off">
-                    </div>
-                    <div class="panel-section">
-                        <h3>Execution</h3>
-                        <div class="ctrl-btn-group">
-                            <button class="btn btn-run" id="run1-btn" onclick="startValidation(1)">Run</button>
-                            <button class="btn btn-step" id="step1-btn" onclick="manualStep(1)">Step</button>
-                            <button class="btn btn-back" id="back1-btn" onclick="stepBack(1)" disabled>Back</button>
+
+                <div style="display:flex; flex-direction:column; gap:16px; width:var(--panel-width); flex-shrink:0;">
+                    <div class="control-panel" style="width:100%;">
+                        <div class="panel-section">
+                            <h3>Input String</h3>
+                            <input type="text" id="input1" placeholder="e.g., bababaa" autocomplete="off">
                         </div>
-                        <button class="btn btn-reset full-width" id="reset1-btn" onclick="resetSimulation(1)">Reset</button>
+                        <div class="panel-section">
+                            <h3>Execution</h3>
+                            <div class="ctrl-btn-group">
+                                <button class="btn btn-run" id="run1-btn" onclick="startValidation(1)">Run</button>
+                                <button class="btn btn-step" id="step1-btn" onclick="manualStep(1)">Step</button>
+                                <button class="btn btn-back" id="back1-btn" onclick="stepBack(1)" disabled>Back</button>
+                            </div>
+                            <button class="btn btn-reset full-width" id="reset1-btn" onclick="resetSimulation(1)">Reset</button>
+                        </div>
+                        <div class="panel-section">
+                            <div class="status-badge" id="status1">&ndash;</div>
+                        </div>
                     </div>
-                    <div class="panel-section">
-                        <div class="status-badge" id="status1">&ndash;</div>
+
+                    <div class="history-panel">
+                        <div class="history-header">
+                            <h3>History</h3>
+                            <button class="btn-history-clear" onclick="clearHistory(1)">Clear</button>
+                        </div>
+                        <div class="history-list" id="history-list-1">
+                            <span class="tape-placeholder">No runs yet.</span>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- Two-column workspace for Regex 2 -->
             <div class="two-column" id="two-column-2" style="display:none;">
+
                 <div class="canvas-area">
                     <div class="tape-panel" id="tape-panel-2">
                         <div class="tape-title">Tape 2</div>
@@ -115,26 +131,42 @@
                         <svg id="dfa2-svg" viewBox="0 0 1300 520"></svg>
                     </div>
                 </div>
-                <div class="control-panel">
-                    <div class="panel-section">
-                        <h3>Input String</h3>
-                        <input type="text" id="input2" placeholder="e.g., 110111010000111" autocomplete="off">
-                    </div>
-                    <div class="panel-section">
-                        <h3>Execution</h3>
-                        <div class="ctrl-btn-group">
-                            <button class="btn btn-run" id="run2-btn" onclick="startValidation(2)">Run</button>
-                            <button class="btn btn-step" id="step2-btn" onclick="manualStep(2)">Step</button>
-                            <button class="btn btn-back" id="back2-btn" onclick="stepBack(2)" disabled>Back</button>
+
+                <div style="display:flex; flex-direction:column; gap:16px; width:var(--panel-width); flex-shrink:0;">
+                    <div class="control-panel" style="width:100%;">
+                        <div class="panel-section">
+                            <h3>Input String</h3>
+                            <input type="text" id="input2" placeholder="e.g., 110111010000111" autocomplete="off">
                         </div>
-                        <button class="btn btn-reset full-width" id="reset2-btn" onclick="resetSimulation(2)">Reset</button>
+                        <div class="panel-section">
+                            <h3>Execution</h3>
+                            <div class="ctrl-btn-group">
+                                <button class="btn btn-run" id="run2-btn" onclick="startValidation(2)">Run</button>
+                                <button class="btn btn-step" id="step2-btn" onclick="manualStep(2)">Step</button>
+                                <button class="btn btn-back" id="back2-btn" onclick="stepBack(2)" disabled>Back</button>
+                            </div>
+                            <button class="btn btn-reset full-width" id="reset2-btn" onclick="resetSimulation(2)">Reset</button>
+                        </div>
+                        <div class="panel-section">
+                            <div class="status-badge" id="status2">&ndash;</div>
+                        </div>
                     </div>
-                    <div class="panel-section">
-                        <div class="status-badge" id="status2">&ndash;</div>
+
+                    <div class="history-panel">
+                        <div class="history-header">
+                            <h3>History</h3>
+                            <button class="btn-history-clear" onclick="clearHistory(2)">Clear</button>
+                        </div>
+                        <div class="history-list" id="history-list-2">
+                            <span class="tape-placeholder">No runs yet.</span>
+                        </div>
                     </div>
                 </div>
+
             </div>
+
         </section>
+        
 
         <!-- ============ CFG SECTION ============ -->
         <section class="section-content" id="section-cfg">

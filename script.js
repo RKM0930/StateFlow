@@ -148,6 +148,8 @@ var simulation = {
     activeSubTab: 1
 };
 
+var runHistory = { 1: [], 2: [] };
+
 var currentSubTab = 1;
 var currentSection = 'dfa-regex';
 
@@ -955,6 +957,9 @@ function finishSimulation(dfaNum, dfa) {
     updateTape(dfaNum, simulation.input, simulation.stepIndex, finalResult);
     document.getElementById('run' + dfaNum + '-btn').disabled = true;
     document.getElementById('step' + dfaNum + '-btn').disabled = true;
+
+    // Record to history
+    addHistoryEntry(dfaNum, simulation.input, finalResult);
 }
 
 function resetSimulation(dfaNum) {
@@ -1034,6 +1039,63 @@ function getFinalResult() {
     var dfa = simulation.dfaNum === 1 ? dfa1 : dfa2;
     if (lastState === -1 || dfa.accept.indexOf(lastState) === -1) return 'rejected';
     return 'accepted';
+}
+
+function addHistoryEntry(dfaNum, inputStr, result) {
+    var hist = runHistory[dfaNum];
+
+    // If this input already exists anywhere in history, don't add it again
+    for (var i = 0; i < hist.length; i++) {
+        if (hist[i].input === inputStr) return;
+    }
+
+    hist.push({ input: inputStr, result: result });
+    renderHistory(dfaNum);
+}
+
+function renderHistory(dfaNum) {
+    var container = document.getElementById('history-list-' + dfaNum);
+    if (!container) return;
+    var hist = runHistory[dfaNum];
+    if (hist.length === 0) {
+        container.innerHTML = '<span class="tape-placeholder">No runs yet.</span>';
+        return;
+    }
+    container.innerHTML = '';
+    // Show newest first
+    for (var i = hist.length - 1; i >= 0; i--) {
+        (function(entry) {
+            var el = document.createElement('div');
+            el.className = 'history-entry';
+            el.title = 'Click to re-run: ' + entry.input;
+            el.innerHTML =
+                '<div class="history-entry-left">' +
+                '  <span class="history-dot ' + entry.result + '"></span>' +
+                '  <span class="history-string">' + entry.input + '</span>' +
+                '</div>' +
+                '<div style="display:flex;align-items:center;gap:6px;">' +
+                '  <span class="history-badge ' + entry.result + '">' +
+                (entry.result === 'accepted' ? 'Accepted' : 'Rejected') +
+                '  </span>' +
+                '  <button class="history-run-btn" title="Re-run">Run &#9654;</button>' +
+                '</div>';
+
+            el.querySelector('.history-run-btn').onclick = function(e) {
+                e.stopPropagation();
+                resetSimulation(dfaNum);
+                setTimeout(function() {
+                    document.getElementById('input' + dfaNum).value = entry.input;
+                    startValidation(dfaNum);
+                }, 50);
+            };
+            container.appendChild(el);
+        })(hist[i]);
+    }
+}
+
+function clearHistory(dfaNum) {
+    runHistory[dfaNum] = [];
+    renderHistory(dfaNum);
 }
 
 // =======================================================
