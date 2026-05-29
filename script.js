@@ -148,7 +148,6 @@ var simulation = {
     activeSubTab: 1
 };
 
-var runHistory = { 1: [], 2: [] };
 
 var currentSubTab = 1;
 var currentSection = 'dfa-regex';
@@ -208,6 +207,8 @@ window.onload = function() {
     drawDFA(dfa2, 'dfa2-svg', [], 0, null);
     switchSection('dfa-regex');
     applySubTab(1);
+    setInputMode(1, 'single');
+    setInputMode(2, 'single');
     initPDAZoom('pda-viewport-1');
     initPDAZoom('pda-viewport-2');
     updatePDAImages();
@@ -944,11 +945,11 @@ function finishSimulation(dfaNum, dfa) {
 
     var finalResult = null;
     if (lastState === -1 || dfa.accept.indexOf(lastState) === -1) {
-        statusBadge.innerHTML = 'Rejected';
+        statusBadge.innerHTML = 'INVALID';
         statusBadge.style.color = '#e05555';
         finalResult = 'rejected';
     } else {
-        statusBadge.innerHTML = 'Accepted';
+        statusBadge.innerHTML = 'VALID';
         statusBadge.style.color = '#3cc972';
         finalResult = 'accepted';
     }
@@ -958,8 +959,6 @@ function finishSimulation(dfaNum, dfa) {
     document.getElementById('run' + dfaNum + '-btn').disabled = true;
     document.getElementById('step' + dfaNum + '-btn').disabled = true;
 
-    // Record to history
-    addHistoryEntry(dfaNum, simulation.input, finalResult);
 }
 
 function resetSimulation(dfaNum) {
@@ -1041,61 +1040,318 @@ function getFinalResult() {
     return 'accepted';
 }
 
-function addHistoryEntry(dfaNum, inputStr, result) {
-    var hist = runHistory[dfaNum];
 
-    // If this input already exists anywhere in history, don't add it again
-    for (var i = 0; i < hist.length; i++) {
-        if (hist[i].input === inputStr) return;
-    }
 
-    hist.push({ input: inputStr, result: result });
-    renderHistory(dfaNum);
+function setInputMode(dfaNum, mode) {
+    var singleBtn = document.getElementById('single-mode-' + dfaNum);
+    var batchBtn = document.getElementById('batch-mode-' + dfaNum);
+    var singleInput = document.getElementById('input' + dfaNum);
+    var batchInput = document.getElementById('batch-input-' + dfaNum);
+    var singleControls = document.getElementById('single-controls-' + dfaNum);
+    var batchControls = document.getElementById('batch-controls-' + dfaNum);
+    var singleStatus = document.getElementById('single-status-' + dfaNum);
+
+    var isBatch = mode === 'batch';
+
+    if (singleBtn) singleBtn.classList.toggle('active', !isBatch);
+    if (batchBtn) batchBtn.classList.toggle('active', isBatch);
+    if (singleInput) singleInput.style.display = isBatch ? 'none' : 'block';
+    if (batchInput) batchInput.style.display = isBatch ? 'block' : 'none';
+    if (singleControls) singleControls.style.display = isBatch ? 'none' : 'block';
+    if (batchControls) batchControls.style.display = isBatch ? 'block' : 'none';
+    if (singleStatus) singleStatus.style.display = isBatch ? 'none' : 'block';
 }
 
-function renderHistory(dfaNum) {
-    var container = document.getElementById('history-list-' + dfaNum);
+// =======================================================
+// BATCH VALIDATION + DFA TRACE
+// =======================================================
+var batchResults = { 1: [], 2: [] };
+var batchTraceActive = false;
+
+function getDFA(dfaNum) {
+    return dfaNum === 1 ? dfa1 : dfa2;
+}
+
+function buildDFAPath(dfa, inputStr) {
+    var path = [dfa.start];
+    var current = dfa.start;
+
+    for (var i = 0; i < inputStr.length; i++) {
+        var sym = inputStr[i];
+        var next = null;
+
+        for (var k = 0; k < dfa.transitions.length; k++) {
+            if (dfa.transitions[k][0] === current && dfa.transitions[k][1] === sym) {
+                next = dfa.transitions[k][2];
+                break;
+            }
+        }
+
+        if (next === null) {
+            path.push(-1);
+            break;
+        }
+
+        current = next;
+        path.push(current);
+    }
+
+    return path;
+}
+
+function evaluateDFAInput(dfa, inputStr) {
+    if (inputStr === '') {
+        return {
+            input: inputStr,
+            result: 'invalid',
+            label: 'INVALID',
+            reason: 'Empty string is not valid for this regex.',
+            path: [],
+            finalState: null
+        };
+    }
+
+    for (var i = 0; i < inputStr.length; i++) {
+        if (dfa.alphabet.indexOf(inputStr[i]) === -1) {
+            return {
+                input: inputStr,
+                result: 'invalid',
+                label: 'INVALID',
+                reason: 'Invalid character: ' + inputStr[i],
+                path: [],
+                finalState: null
+            };
+        }
+    }
+
+    var path = buildDFAPath(dfa, inputStr);
+    var finalState = path[path.length - 1];
+    var accepted = finalState !== -1 && dfa.accept.indexOf(finalState) !== -1;
+
+    return {
+        input: inputStr,
+        result: accepted ? 'accepted' : 'rejected',
+        label: accepted ? 'VALID' : 'INVALID',
+        reason: accepted ? 'Ends in an accepting state.' : 'Does not end in an accepting state.',
+        path: path,
+        finalState: finalState
+    };
+}
+
+function parseBatchStrings(dfaNum) {
+    var input = document.getElementById('batch-input-' + dfaNum);
+    if (!input) return [];
+
+    return input.value
+        .split(/[\n,]+/)
+        .map(function(s) { return s.trim(); })
+        .filter(function(s) { return s.length > 0; });
+}
+
+function validateBatchStrings(dfaNum) {
+    var dfa = getDFA(dfaNum);
+    var strings = parseBatchStrings(dfaNum);
+    var status = document.getElementById('batch-status-' + dfaNum);
+
+    if (strings.length === 0) {
+        alert('Please enter at least one string for batch validation.');
+        return [];
+    }
+
+    var results = [];
+    for (var i = 0; i < strings.length; i++) {
+        results.push(evaluateDFAInput(dfa, strings[i]));
+    }
+
+    batchResults[dfaNum] = results;
+    renderBatchResults(dfaNum);
+
+    var validCount = results.filter(function(r) { return r.result === 'accepted'; }).length;
+    var invalidCount = results.length - validCount;
+
+    if (status) {
+        status.textContent = 'Validated ' + results.length + ' string(s): ' +
+            validCount + ' valid, ' +
+            invalidCount + ' invalid.';
+    }
+
+    return results;
+}
+
+function renderBatchResults(dfaNum) {
+    var container = document.getElementById('batch-results-' + dfaNum);
     if (!container) return;
-    var hist = runHistory[dfaNum];
-    if (hist.length === 0) {
-        container.innerHTML = '<span class="tape-placeholder">No runs yet.</span>';
+
+    var results = batchResults[dfaNum] || [];
+    if (results.length === 0) {
+        container.innerHTML = '<span class="tape-placeholder">No batch results yet.</span>';
         return;
     }
-    container.innerHTML = '';
-    // Show newest first
-    for (var i = hist.length - 1; i >= 0; i--) {
-        (function(entry) {
-            var el = document.createElement('div');
-            el.className = 'history-entry';
-            el.title = 'Click to re-run: ' + entry.input;
-            el.innerHTML =
-                '<div class="history-entry-left">' +
-                '  <span class="history-dot ' + entry.result + '"></span>' +
-                '  <span class="history-string">' + entry.input + '</span>' +
-                '</div>' +
-                '<div style="display:flex;align-items:center;gap:6px;">' +
-                '  <span class="history-badge ' + entry.result + '">' +
-                (entry.result === 'accepted' ? 'Accepted' : 'Rejected') +
-                '  </span>' +
-                '  <button class="history-run-btn" title="Re-run">Run &#9654;</button>' +
-                '</div>';
 
-            el.querySelector('.history-run-btn').onclick = function(e) {
-                e.stopPropagation();
-                resetSimulation(dfaNum);
-                setTimeout(function() {
-                    document.getElementById('input' + dfaNum).value = entry.input;
-                    startValidation(dfaNum);
-                }, 50);
+    container.innerHTML = '';
+
+    for (var i = 0; i < results.length; i++) {
+        (function(index, entry) {
+            var row = document.createElement('div');
+            row.className = 'batch-entry';
+            row.id = 'batch-entry-' + dfaNum + '-' + index;
+
+            var left = document.createElement('div');
+            left.className = 'batch-entry-left';
+
+            var dot = document.createElement('span');
+            dot.className = 'history-dot ' + (entry.result === 'invalid' ? 'rejected' : entry.result);
+
+            var text = document.createElement('span');
+            text.className = 'batch-string';
+            text.textContent = entry.input;
+
+            left.appendChild(dot);
+            left.appendChild(text);
+
+            var actions = document.createElement('div');
+            actions.className = 'batch-actions';
+
+            var badge = document.createElement('span');
+            badge.className = 'batch-badge ' + entry.result;
+            badge.textContent = entry.label;
+
+            var traceBtn = document.createElement('button');
+            traceBtn.className = 'batch-trace-btn';
+            traceBtn.textContent = 'Trace';
+            traceBtn.title = entry.result === 'invalid' ? 'Invalid strings cannot be traced.' : 'Trace this string through the DFA';
+            traceBtn.disabled = entry.result === 'invalid';
+            traceBtn.onclick = function() {
+                traceBatchString(dfaNum, index);
             };
-            container.appendChild(el);
-        })(hist[i]);
+
+            actions.appendChild(badge);
+            actions.appendChild(traceBtn);
+
+            row.appendChild(left);
+            row.appendChild(actions);
+            container.appendChild(row);
+        })(i, results[i]);
     }
 }
 
-function clearHistory(dfaNum) {
-    runHistory[dfaNum] = [];
-    renderHistory(dfaNum);
+function setActiveBatchEntry(dfaNum, index) {
+    var rows = document.querySelectorAll('#batch-results-' + dfaNum + ' .batch-entry');
+    rows.forEach(function(row) {
+        row.classList.remove('active-trace');
+    });
+
+    var active = document.getElementById('batch-entry-' + dfaNum + '-' + index);
+    if (active) active.classList.add('active-trace');
+}
+
+function traceBatchString(dfaNum, index, onDone) {
+    var results = batchResults[dfaNum] || [];
+
+    if (!results.length) {
+        results = validateBatchStrings(dfaNum);
+    }
+
+    var entry = results[index];
+    if (!entry) return;
+
+    if (entry.result === 'invalid') {
+        alert('Invalid strings cannot be traced through the DFA.');
+        return;
+    }
+
+    if (simulation.autoTimer) {
+        clearTimeout(simulation.autoTimer);
+        simulation.autoTimer = null;
+    }
+
+    switchSection('dfa-regex');
+    applySubTab(dfaNum);
+    setActiveBatchEntry(dfaNum, index);
+
+    resetSimulation(dfaNum);
+    document.getElementById('input' + dfaNum).value = entry.input;
+
+    var status = document.getElementById('batch-status-' + dfaNum);
+    if (status) status.textContent = 'Tracing: ' + entry.input;
+
+    startValidation(dfaNum);
+
+    function waitUntilDone() {
+        if (simulation.dfaNum === dfaNum && simulation.input === entry.input && simulation.finished) {
+            if (status) status.textContent = 'Finished tracing: ' + entry.input + ' — ' + entry.label + '.';
+            if (typeof onDone === 'function') {
+                setTimeout(onDone, 700);
+            }
+        } else {
+            setTimeout(waitUntilDone, 250);
+        }
+    }
+
+    waitUntilDone();
+}
+
+function traceBatchThroughDFA(dfaNum) {
+    if (batchTraceActive) {
+        alert('A batch trace is already running.');
+        return;
+    }
+
+    var results = batchResults[dfaNum] || [];
+    if (!results.length) {
+        results = validateBatchStrings(dfaNum);
+    }
+
+    var traceableIndexes = [];
+    for (var i = 0; i < results.length; i++) {
+        if (results[i].result !== 'invalid') {
+            traceableIndexes.push(i);
+        }
+    }
+
+    if (traceableIndexes.length === 0) {
+        alert('There are no valid-alphabet strings to trace.');
+        return;
+    }
+
+    batchTraceActive = true;
+
+    var status = document.getElementById('batch-status-' + dfaNum);
+    if (status) {
+        status.textContent = 'Tracing batch through DFA: 0/' + traceableIndexes.length;
+    }
+
+    var current = 0;
+
+    function runNext() {
+        if (current >= traceableIndexes.length) {
+            batchTraceActive = false;
+            if (status) {
+                status.textContent = 'Batch trace complete: ' + traceableIndexes.length + ' string(s) traced.';
+            }
+
+            var runBtn = document.getElementById('run' + dfaNum + '-btn');
+            var stepBtn = document.getElementById('step' + dfaNum + '-btn');
+            if (runBtn) runBtn.disabled = false;
+            if (stepBtn) stepBtn.disabled = false;
+
+            return;
+        }
+
+        var resultIndex = traceableIndexes[current];
+        var entry = results[resultIndex];
+
+        if (status) {
+            status.textContent = 'Tracing batch through DFA: ' + (current + 1) + '/' + traceableIndexes.length + ' — ' + entry.input;
+        }
+
+        traceBatchString(dfaNum, resultIndex, function() {
+            current++;
+            runNext();
+        });
+    }
+
+    runNext();
 }
 
 // =======================================================

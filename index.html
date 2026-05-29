@@ -86,11 +86,19 @@
 
                 <div style="display:flex; flex-direction:column; gap:16px; width:var(--panel-width); flex-shrink:0;">
                     <div class="control-panel" style="width:100%;">
-                        <div class="panel-section">
-                            <h3>Input String</h3>
-                            <input type="text" id="input1" placeholder="e.g., bababaa" autocomplete="off">
+                        <div class="panel-section input-switch-section">
+                            <div class="input-mode-header">
+                                <h3>Input String</h3>
+                                <div class="mode-toggle" role="group" aria-label="Input mode selector">
+                                    <button type="button" class="mode-toggle-btn active" id="single-mode-1" onclick="setInputMode(1, 'single')" title="Single string mode" aria-label="Single string mode">↳</button>
+                                    <button type="button" class="mode-toggle-btn" id="batch-mode-1" onclick="setInputMode(1, 'batch')" title="Batch string mode" aria-label="Batch string mode">☷</button>
+                                </div>
+                            </div>
+                            <input type="text" id="input1" class="single-input-field" placeholder="e.g., bababaa" autocomplete="off">
+                            <textarea id="batch-input-1" class="batch-input inline-batch-input" placeholder="bababaa&#10;bbabababb&#10;aabab" style="display:none;"></textarea>
                         </div>
-                        <div class="panel-section">
+
+                        <div class="panel-section single-controls" id="single-controls-1">
                             <h3>Execution</h3>
                             <div class="ctrl-btn-group">
                                 <button class="btn btn-run" id="run1-btn" onclick="startValidation(1)">Run</button>
@@ -99,22 +107,25 @@
                             </div>
                             <button class="btn btn-reset full-width" id="reset1-btn" onclick="resetSimulation(1)">Reset</button>
                         </div>
-                        <div class="panel-section">
+
+                        <div class="panel-section batch-controls" id="batch-controls-1" style="display:none;">
+                            <h3>Batch Trace</h3>
+                            <div class="batch-btn-group inline-batch-actions">
+                                <button class="btn btn-run full-width" onclick="validateBatchStrings(1)">Validate Batch</button>
+                                <button class="btn btn-step full-width" onclick="traceBatchThroughDFA(1)">Trace Batch</button>
+                            </div>
+                            <div class="batch-status" id="batch-status-1">&ndash;</div>
+                            <div class="batch-results" id="batch-results-1">
+                                <span class="tape-placeholder">No batch results yet.</span>
+                            </div>
+                        </div>
+
+                        <div class="panel-section single-status" id="single-status-1">
                             <div class="status-badge" id="status1">&ndash;</div>
                         </div>
                     </div>
 
-                    <div class="history-panel">
-                        <div class="history-header">
-                            <h3>History</h3>
-                            <button class="btn-history-clear" onclick="clearHistory(1)">Clear</button>
-                        </div>
-                        <div class="history-list" id="history-list-1">
-                            <span class="tape-placeholder">No runs yet.</span>
-                        </div>
-                    </div>
                 </div>
-
             </div>
 
             <!-- Two-column workspace for Regex 2 -->
@@ -134,11 +145,19 @@
 
                 <div style="display:flex; flex-direction:column; gap:16px; width:var(--panel-width); flex-shrink:0;">
                     <div class="control-panel" style="width:100%;">
-                        <div class="panel-section">
-                            <h3>Input String</h3>
-                            <input type="text" id="input2" placeholder="e.g., 110111010000111" autocomplete="off">
+                        <div class="panel-section input-switch-section">
+                            <div class="input-mode-header">
+                                <h3>Input String</h3>
+                                <div class="mode-toggle" role="group" aria-label="Input mode selector">
+                                    <button type="button" class="mode-toggle-btn active" id="single-mode-2" onclick="setInputMode(2, 'single')" title="Single string mode" aria-label="Single string mode">↳</button>
+                                    <button type="button" class="mode-toggle-btn" id="batch-mode-2" onclick="setInputMode(2, 'batch')" title="Batch string mode" aria-label="Batch string mode">☷</button>
+                                </div>
+                            </div>
+                            <input type="text" id="input2" class="single-input-field" placeholder="e.g., 110111010000111" autocomplete="off">
+                            <textarea id="batch-input-2" class="batch-input inline-batch-input" placeholder="111101&#10;000111&#10;111011" style="display:none;"></textarea>
                         </div>
-                        <div class="panel-section">
+
+                        <div class="panel-section single-controls" id="single-controls-2">
                             <h3>Execution</h3>
                             <div class="ctrl-btn-group">
                                 <button class="btn btn-run" id="run2-btn" onclick="startValidation(2)">Run</button>
@@ -147,22 +166,25 @@
                             </div>
                             <button class="btn btn-reset full-width" id="reset2-btn" onclick="resetSimulation(2)">Reset</button>
                         </div>
-                        <div class="panel-section">
+
+                        <div class="panel-section batch-controls" id="batch-controls-2" style="display:none;">
+                            <h3>Batch Trace</h3>
+                            <div class="batch-btn-group inline-batch-actions">
+                                <button class="btn btn-run full-width" onclick="validateBatchStrings(2)">Validate Batch</button>
+                                <button class="btn btn-step full-width" onclick="traceBatchThroughDFA(2)">Trace Batch</button>
+                            </div>
+                            <div class="batch-status" id="batch-status-2">&ndash;</div>
+                            <div class="batch-results" id="batch-results-2">
+                                <span class="tape-placeholder">No batch results yet.</span>
+                            </div>
+                        </div>
+
+                        <div class="panel-section single-status" id="single-status-2">
                             <div class="status-badge" id="status2">&ndash;</div>
                         </div>
                     </div>
 
-                    <div class="history-panel">
-                        <div class="history-header">
-                            <h3>History</h3>
-                            <button class="btn-history-clear" onclick="clearHistory(2)">Clear</button>
-                        </div>
-                        <div class="history-list" id="history-list-2">
-                            <span class="tape-placeholder">No runs yet.</span>
-                        </div>
-                    </div>
                 </div>
-
             </div>
 
         </section>
